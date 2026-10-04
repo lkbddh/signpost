@@ -1,0 +1,5 @@
+[Desktop Entry]
+Type=Application
+MimeType=x-scheme-handler/https;
+Name=Bad
+Exec="unterminated %u

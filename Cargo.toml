@@ -1,0 +1,54 @@
+[package]
+name = "signpost"
+version = "0.1.0"
+edition = "2024"
+rust-version = "1.93"
+license = "GPL-3.0-or-later"
+description = "A link chooser for the COSMIC desktop"
+
+[workspace]
+members = ["."]
+exclude = ["vendor/iced_winit"]
+
+[lib]
+path = "src/lib.rs"
+
+[[bin]]
+name = "signpost"
+path = "src/main.rs"
+
+[dependencies]
+# Cargo.lock pins libcosmic to 87ab8179e1bd, the revision vendor/iced_winit is taken from. It is named by its default
+# branch, as cosmic-settings-config names it, so the two resolve to one copy: with a `rev` they would be separate
+# sources, each with its own cosmic-config, which a vendored build (the Flatpak's) cannot hold side by side.
+libcosmic = { git = "https://github.com/pop-os/libcosmic", default-features = false, features = ["a11y", "desktop", "multi-window", "tokio", "wayland", "wgpu", "winit"] }
+cosmic-mime-apps = { git = "https://github.com/pop-os/cosmic-mime-apps.git", rev = "8fc81e8857e46c018ea21ab985aaf30ac853c007" }
+cosmic-settings-config = { git = "https://github.com/pop-os/cosmic-settings-daemon" }
+zbus = { version = "5.17", default-features = false, features = ["tokio", "p2p"] }
+tokio = { version = "1", features = ["rt-multi-thread", "macros", "sync", "time", "signal", "net"] }
+futures-util = "0.3"
+serde = { version = "1", features = ["derive"] }
+serde_json = "1"
+url = "2.5"
+mime = "0.3.17"
+notify = "8"
+rustix = { version = "1", features = ["fs", "process"] }
+thiserror = "2"
+tracing = "0.1"
+tracing-subscriber = { version = "0.3", features = ["env-filter"] }
+i18n-embed = { version = "0.16", features = ["fluent-system", "desktop-requester"] }
+i18n-embed-fl = "0.10"
+rust-embed = "8"
+
+[dev-dependencies]
+tokio = { version = "1", features = ["test-util"] }
+tempfile = "3"
+usvg = { version = "0.45.1", default-features = false }
+
+[patch."https://github.com/pop-os/libcosmic.git"]
+iced_winit = { path = "vendor/iced_winit" }
+
+[profile.release]
+lto = "thin"
+codegen-units = 1
+strip = "debuginfo"

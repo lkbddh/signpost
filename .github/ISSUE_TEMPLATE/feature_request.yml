@@ -1,0 +1,20 @@
+name: Feature request
+description: Suggest a change to Signpost.
+labels: [enhancement]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Signpost is a quick picker for links: no accounts, no telemetry, and it never changes your default browser without you pressing a button.
+  - type: textarea
+    id: problem
+    attributes:
+      label: The problem
+      description: What you are trying to do and what gets in the way. Describe the problem rather than a solution.
+    validations:
+      required: true
+  - type: textarea
+    id: idea
+    attributes:
+      label: What you have in mind
+      description: Optional. How you picture it working.

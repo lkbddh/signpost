@@ -1,0 +1,6 @@
+[Desktop Entry]
+Type=Application
+MimeType=x-scheme-handler/https;
+Name=Hidden
+Exec=hidden %u
+Hidden=true

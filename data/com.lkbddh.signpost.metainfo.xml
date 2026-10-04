@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<component type="desktop-application">
+  <id>com.lkbddh.signpost</id>
+  <name>Signpost</name>
+  <summary>Choose which browser opens each link</summary>
+  <metadata_license>CC0-1.0</metadata_license>
+  <project_license>GPL-3.0-or-later</project_license>
+  <description>
+    <p>
+      Signpost is a link chooser for the COSMIC™ desktop. Make it your default handler for web links, and every link
+      you open from any app shows a small picker of your browsers, each browser profile, and the other apps that can
+      open it. Pick one and the link opens there.
+    </p>
+    <ul>
+      <li>Every profile of Chrome, Chromium, Brave, Edge, Vivaldi, Helium, Firefox, LibreWolf, Zen and Floorp as a tile of its own</li>
+      <li>Number keys, arrows and Enter pick without the mouse; Ctrl+Enter keeps the picker open</li>
+      <li>Private windows and each app's actions from a tile's menu</li>
+      <li>Links that arrive while the picker is open wait their turn</li>
+      <li>Your previous browser is recorded and can be restored with one button</li>
+      <li>Follows the COSMIC theme, including frosted windows</li>
+    </ul>
+  </description>
+  <launchable type="desktop-id">com.lkbddh.signpost.desktop</launchable>
+  <url type="homepage">https://github.com/lkbddh/signpost</url>
+  <url type="bugtracker">https://github.com/lkbddh/signpost/issues</url>
+  <url type="vcs-browser">https://github.com/lkbddh/signpost</url>
+  <developer id="com.lkbddh">
+    <name>lkbddh</name>
+  </developer>
+  <content_rating type="oars-1.1" />
+  <provides>
+    <binary>signpost</binary>
+    <dbus type="user">com.lkbddh.signpost</dbus>
+  </provides>
+  <releases>
+    <release version="0.1.0" date="2026-10-03">
+      <description>
+        <p>Initial release</p>
+      </description>
+    </release>
+  </releases>
+  <categories>
+    <category>Network</category>
+    <category>WebBrowser</category>
+  </categories>
+  <keywords>
+    <keyword>browser</keyword>
+    <keyword>link</keyword>
+    <keyword>chooser</keyword>
+    <keyword>profile</keyword>
+    <keyword>default</keyword>
+  </keywords>
+  <requires>
+    <display_length compare="ge">360</display_length>
+  </requires>
+  <supports>
+    <control>pointing</control>
+    <control>keyboard</control>
+    <control>touch</control>
+  </supports>
+</component>

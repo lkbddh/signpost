@@ -1,0 +1,61 @@
+app-id: com.lkbddh.signpost
+runtime: org.freedesktop.Platform
+runtime-version: '26.08'
+sdk: org.freedesktop.Sdk
+sdk-extensions:
+  - org.freedesktop.Sdk.Extension.rust-stable
+command: signpost
+
+finish-args:
+  # Wayland only (libcosmic), with GPU acceleration
+  - --socket=wayland
+  - --device=dri
+  # D-Bus activation, its own name, and the launches it asks other apps for
+  - --socket=session-bus
+  # The host's apps, default-app lists and browser profiles, read where they are; launches run on the host
+  - --filesystem=host:ro
+  # Set as default and Restore edit the user's mimeapps.list
+  - --filesystem=xdg-config:create
+  # Flatpak apps installed for the user and for the system
+  - --filesystem=xdg-data/flatpak:ro
+  - --filesystem=/var/lib/flatpak:ro
+  # The profiles of the browsers installed as Flatpaks, which host:ro leaves out
+  - --filesystem=~/.var/app/com.google.Chrome:ro
+  - --filesystem=~/.var/app/org.chromium.Chromium:ro
+  - --filesystem=~/.var/app/com.brave.Browser:ro
+  - --filesystem=~/.var/app/com.brave.Origin:ro
+  - --filesystem=~/.var/app/com.vivaldi.Vivaldi:ro
+  - --filesystem=~/.var/app/com.microsoft.Edge:ro
+  - --filesystem=~/.var/app/org.mozilla.firefox:ro
+  - --filesystem=~/.var/app/io.gitlab.librewolf-community:ro
+  - --filesystem=~/.var/app/app.zen_browser.zen:ro
+  - --filesystem=~/.var/app/one.ablaze.floorp:ro
+
+build-options:
+  append-path: /usr/lib/sdk/rust-stable/bin
+  env:
+    CARGO_HOME: /run/build/signpost/cargo
+
+modules:
+  - name: signpost
+    buildsystem: simple
+    build-commands:
+      - cargo --offline fetch --manifest-path Cargo.toml --locked --verbose
+      - cargo --offline build --release --locked --verbose
+      - install -Dm755 target/release/signpost /app/bin/signpost
+      - install -Dm644 data/com.lkbddh.signpost.desktop /app/share/applications/com.lkbddh.signpost.desktop
+      - install -Dm644 data/com.lkbddh.signpost.metainfo.xml /app/share/metainfo/com.lkbddh.signpost.metainfo.xml
+      - sed 's|@bindir@|/app/bin|' data/com.lkbddh.signpost.service.in > com.lkbddh.signpost.service
+      - install -Dm644 com.lkbddh.signpost.service /app/share/dbus-1/services/com.lkbddh.signpost.service
+      - install -Dm644 data/icons/com.lkbddh.signpost.svg /app/share/icons/hicolor/scalable/apps/com.lkbddh.signpost.svg
+      - install -Dm644 data/icons/com.lkbddh.signpost-symbolic.svg /app/share/icons/hicolor/symbolic/apps/com.lkbddh.signpost-symbolic.svg
+      - install -Dm644 README.md /app/share/doc/signpost/README.md
+      - install -Dm644 LICENSE /app/share/doc/signpost/LICENSE
+      - install -Dm644 THIRD_PARTY_NOTICES.md /app/share/doc/signpost/THIRD_PARTY_NOTICES.md
+      - install -Dm644 THIRD_PARTY_LICENSES.md /app/share/doc/signpost/THIRD_PARTY_LICENSES.md
+    sources:
+      - type: dir
+        path: .
+        skip:
+          - target
+      - cargo-sources.json

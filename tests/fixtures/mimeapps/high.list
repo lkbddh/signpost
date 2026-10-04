@@ -1,0 +1,8 @@
+[Default Applications]
+x-scheme-handler/https=google-chrome.desktop
+
+[Added Associations]
+x-scheme-handler/https=org.example.DbusOnly.desktop;
+
+[Removed Associations]
+x-scheme-handler/https=env-browser.desktop;

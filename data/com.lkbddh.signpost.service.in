@@ -1,0 +1,3 @@
+[D-BUS Service]
+Name=com.lkbddh.signpost
+Exec=@bindir@/signpost --service

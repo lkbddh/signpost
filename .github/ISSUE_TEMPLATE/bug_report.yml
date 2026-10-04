@@ -1,0 +1,48 @@
+name: Bug report
+description: Something in Signpost does not work as it should.
+labels: [bug]
+body:
+  - type: textarea
+    id: what
+    attributes:
+      label: What happened
+      description: What you did, what you expected, and what happened instead.
+    validations:
+      required: true
+  - type: input
+    id: version
+    attributes:
+      label: Signpost version
+      description: "`signpost --version`, or About in the settings window."
+      placeholder: "0.1.0"
+    validations:
+      required: true
+  - type: dropdown
+    id: install
+    attributes:
+      label: How you installed it
+      options:
+        - .deb package
+        - Flatpak
+        - From source (just install)
+    validations:
+      required: true
+  - type: input
+    id: system
+    attributes:
+      label: Distribution and COSMIC version
+      placeholder: "Pop!_OS 24.04, COSMIC epoch 1"
+    validations:
+      required: true
+  - type: input
+    id: apps
+    attributes:
+      label: The app or browser involved
+      description: Optional. Its name, and whether it is a native package or a Flatpak.
+  - type: textarea
+    id: log
+    attributes:
+      label: Debug log
+      description: |
+        Signpost stays running between links, so stop it first with `kill -TERM $(busctl --user status com.lkbddh.signpost | sed -n 's/^PID=//p')`. Then start it from a terminal with `RUST_LOG=signpost=debug signpost --service` (Flatpak: `flatpak run --env=RUST_LOG=signpost=debug com.lkbddh.signpost --service`), open a link to reproduce the problem, and paste the output. Remove any links or paths you do not want to share.
+      render: text

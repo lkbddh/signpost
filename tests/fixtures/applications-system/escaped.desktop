@@ -1,0 +1,10 @@
+[Desktop Entry]
+Type=Application
+Name=Escaped
+Exec=printer "a\\\\b" "\\$HOME" %u
+MimeType=x-scheme-handler/https;
+Actions=act;
+
+[Desktop Action act]
+Name=Act
+Exec=printer "c\\\\d" %u

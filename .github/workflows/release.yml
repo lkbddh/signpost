@@ -1,0 +1,105 @@
+name: release
+
+# A version tag builds the .deb and the Flatpak bundle and stages them in a draft release. Pull requests that touch
+# packaging build both without publishing.
+on:
+  push:
+    tags: ["v*"]
+  pull_request:
+    paths:
+      - justfile
+      - Cargo.toml
+      - Cargo.lock
+      - cargo-sources.json
+      - com.lkbddh.signpost.yml
+      - data/**
+      - vendor/**
+      - .github/workflows/release.yml
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  version:
+    runs-on: ubuntu-24.04
+    outputs:
+      version: ${{ steps.version.outputs.version }}
+    steps:
+      - uses: actions/checkout@v4
+      - id: version
+        run: |
+          version=$(python3 -c 'import tomllib; print(tomllib.load(open("Cargo.toml", "rb"))["package"]["version"])')
+          echo "version=$version" >> "$GITHUB_OUTPUT"
+          if [ "$GITHUB_REF_TYPE" = tag ] && [ "$GITHUB_REF_NAME" != "v$version" ]; then
+            echo "::error::Tag $GITHUB_REF_NAME does not match Cargo.toml version $version"
+            exit 1
+          fi
+
+  deb:
+    needs: version
+    runs-on: ubuntu-24.04
+    env:
+      RUSTUP_TOOLCHAIN: "1.93"
+    steps:
+      - uses: actions/checkout@v4
+      - run: sudo apt-get update && sudo apt-get install -y just pkg-config libxkbcommon-dev libwayland-dev dpkg-dev
+      - uses: dtolnay/rust-toolchain@1.93
+      - uses: Swatinem/rust-cache@v2
+      - run: just build && just deb
+      - uses: actions/upload-artifact@v4
+        with:
+          name: deb
+          path: target/deb/*.deb
+          if-no-files-found: error
+
+  flatpak:
+    needs: version
+    runs-on: ubuntu-24.04
+    # Flathub's CI image carries a current flatpak-builder and appstream; the runner's own Ubuntu packages fail the
+    # AppStream compose step.
+    container:
+      image: ghcr.io/flathub-infra/flatpak-github-actions:freedesktop-26.08
+      options: --privileged
+    steps:
+      - uses: actions/checkout@v4
+      - uses: flatpak/flatpak-github-actions/flatpak-builder@v6
+        with:
+          manifest-path: com.lkbddh.signpost.yml
+          bundle: signpost-${{ needs.version.outputs.version }}.flatpak
+          artifact-name: flatpak
+
+  # Automation only stages a draft; a person publishes it once the release has been checked by hand. Uploads never
+  # replace a file, so nothing is ever deleted from a release.
+  publish:
+    if: github.ref_type == 'tag'
+    needs: [version, deb, flatpak]
+    runs-on: ubuntu-24.04
+    concurrency:
+      group: release-${{ github.ref }}
+      cancel-in-progress: false
+    permissions:
+      contents: write
+    env:
+      GH_TOKEN: ${{ github.token }}
+      GH_REPO: ${{ github.repository }}
+      TAG: ${{ github.ref_name }}
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          merge-multiple: true
+      - run: sha256sum *.deb *.flatpak > SHA256SUMS
+      - name: Attach to the draft release
+        run: |
+          is_draft=$(gh release view "$TAG" --json isDraft --jq .isDraft 2>/dev/null || echo absent)
+          if [ "$is_draft" = absent ]; then
+            gh release create "$TAG" *.deb *.flatpak SHA256SUMS --draft \
+              --title "Signpost ${{ needs.version.outputs.version }}" \
+              --notes "Release notes to follow."
+          elif [ "$is_draft" = true ]; then
+            # Fails if a file of the same name is already attached; remove it from the draft to re-run.
+            gh release upload "$TAG" *.deb *.flatpak SHA256SUMS
+          else
+            echo "::error::Release $TAG is already published; its files are left untouched."
+            exit 1
+          fi

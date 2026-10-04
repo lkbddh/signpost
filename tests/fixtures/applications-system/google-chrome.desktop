@@ -1,0 +1,15 @@
+[Desktop Entry]
+Type=Application
+Name=Google Chrome
+Icon=google-chrome
+Exec=/usr/bin/google-chrome-stable %U
+MimeType=x-scheme-handler/http;x-scheme-handler/https;
+Actions=new-window;new-private-window;
+
+[Desktop Action new-window]
+Name=New Window
+Exec=/usr/bin/google-chrome-stable
+
+[Desktop Action new-private-window]
+Name=New Incognito Window
+Exec=/usr/bin/google-chrome-stable --incognito

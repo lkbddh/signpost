@@ -1,0 +1,8 @@
+[Desktop Entry]
+Type=Application
+MimeType=x-scheme-handler/https;
+Name=Term Tool
+Exec=lynx %u
+Terminal=true
+Path=/tmp
+TryExec=lynx
