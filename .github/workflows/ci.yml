@@ -6,12 +6,14 @@ jobs:
   validate:
     runs-on: ubuntu-24.04
     env:
+      # The oldest supported Rust (`rust-version`), named as it is installed below, so rust-toolchain.toml's stable
+      # does not apply.
       RUSTUP_TOOLCHAIN: "1.93"
     steps:
       - uses: actions/checkout@v4
-      - run: sudo apt-get update && sudo apt-get install -y just pkg-config libxkbcommon-dev libwayland-dev desktop-file-utils appstream dbus dpkg-dev
-      - uses: dtolnay/rust-toolchain@1.93
-        with: { components: "rustfmt, clippy" }
+      # The layout tests measure text in COSMIC's own interface fonts, Open Sans and Noto Sans Mono.
+      - run: sudo apt-get update && sudo apt-get install -y just pkg-config libxkbcommon-dev libwayland-dev desktop-file-utils appstream dbus dpkg-dev fonts-open-sans fonts-noto-mono
+      - run: rustup toolchain install 1.93 --profile minimal --component rustfmt,clippy --no-self-update
       - uses: Swatinem/rust-cache@v2
       - run: rustc --version
       - run: just validate
